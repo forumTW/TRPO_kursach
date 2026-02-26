@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Мои результаты{% endblock %}
+{% block nb_res %}active{% endblock %}
+{% block content %}
+<div class="ph">
+  <div class="pt anim">Мои результаты</div>
+  <div class="ps anim d1">История прохождения тестов</div>
+</div>
+<div class="g3 anim d1 mb6">
+  <div class="sc"><div class="sc-n ac">{{ stats.total }}</div><div class="sc-l">Пройдено тестов</div></div>
+  <div class="sc"><div class="sc-n ps">{{ stats.avg_score }}%</div><div class="sc-l">Средний балл</div></div>
+  <div class="sc"><div class="sc-n">{{ stats.passed }}</div><div class="sc-l">Успешно сдано</div></div>
+</div>
+<div class="card anim d2">
+  <div style="padding:16px 22px;border-bottom:1px solid var(--bd)"><div class="st">История попыток</div></div>
+  {% if attempts %}
+  <table>
+    <thead><tr><th>Тест</th><th>Предмет</th><th>Дата</th><th>Результат</th><th>Прогресс</th><th>Статус</th><th></th></tr></thead>
+    <tbody>
+    {% for a in attempts %}
+    <tr>
+      <td style="font-weight:600">{{ a.quiz.title }}</td>
+      <td><span class="bdg bdg-ac">{{ a.quiz.subject.name }}</span></td>
+      <td class="ts td">{{ a.started_at.strftime('%d.%m.%Y %H:%M') }}</td>
+      <td class="fw7 fn" style="color:{% if a.is_passed %}var(--pass){% else %}var(--fail){% endif %}">{{ a.score|int }}%</td>
+      <td><div class="pbar"><div class="pbar-f {% if not a.is_passed %}fail{% endif %}" style="width:{{ a.score }}%"></div></div></td>
+      <td>{% if a.is_passed %}<span class="bdg bdg-ps">Сдан</span>{% else %}<span class="bdg bdg-fl">Не сдан</span>{% endif %}</td>
+      <td><a href="{{ url_for('quiz_result', attempt_id=a.id) }}" class="btn btn-g btn-sm"><i class="bi bi-eye"></i></a></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="tc" style="padding:56px 20px">
+    <div style="font-size:2.8rem;margin-bottom:11px">📋</div>
+    <div class="fn tm">Результатов пока нет</div>
+    <div class="ts td mt2 mb4">Пройдите свой первый тест!</div>
+    <a href="{{ url_for('home') }}" class="btn btn-p">К тестам</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

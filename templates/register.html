@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}Регистрация — Квалиас{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-card anim" style="max-width:500px">
+    <div class="tc mb6">
+      <div class="fn" style="font-size:1.4rem">Создать аккаунт</div>
+      <div class="tm ts mt2">Регистрация студента</div>
+    </div>
+    <form method="post">
+      <div class="g2">
+        <div class="fg">
+          <label class="lbl">Имя</label>
+          <input type="text" name="first_name" placeholder="Иван" required>
+        </div>
+        <div class="fg">
+          <label class="lbl">Фамилия</label>
+          <input type="text" name="last_name" placeholder="Петров">
+        </div>
+      </div>
+      <div class="fg">
+        <label class="lbl">Имя пользователя</label>
+        <input type="text" name="username" placeholder="ivan_petrov" required>
+      </div>
+      <div class="fg">
+        <label class="lbl">Email</label>
+        <input type="email" name="email" placeholder="ivan@example.com" required>
+      </div>
+      <div class="fg">
+        <label class="lbl">Пароль</label>
+        <input type="password" name="password" placeholder="Минимум 6 символов" required>
+      </div>
+      <div class="fg" style="margin-bottom:22px">
+        <label class="lbl">Повторите пароль</label>
+        <input type="password" name="password2" placeholder="Повторите пароль" required>
+      </div>
+      <button type="submit" class="btn btn-p btn-xl btn-full">Создать аккаунт <i class="bi bi-person-check"></i></button>
+    </form>
+    <hr>
+    <div class="tc ts tm">Уже есть аккаунт? <a href="{{ url_for('login') }}" style="color:var(--ac);font-weight:600;text-decoration:none">Войти</a></div>
+  </div>
+</div>
+{% endblock %}

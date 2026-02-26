@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block title %}Редактировать: {{ quiz.title }}{% endblock %}
+{% block nb_dash %}active{% endblock %}
+{% block content %}
+<div class="flex ic jb mb4">
+  <a href="{{ url_for('teacher_dashboard') }}" class="btn btn-g btn-sm"><i class="bi bi-arrow-left"></i> Назад</a>
+  <div class="flex gap2">
+    <a href="{{ url_for('quiz_stats', quiz_id=quiz.id) }}" class="btn btn-t btn-sm"><i class="bi bi-bar-chart"></i> Статистика</a>
+    <form method="post" action="{{ url_for('delete_quiz', quiz_id=quiz.id) }}" onsubmit="return confirm('Удалить тест?')">
+      <button type="submit" class="btn btn-d btn-sm"><i class="bi bi-trash"></i> Удалить</button>
+    </form>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:400px 1fr;gap:18px;align-items:start">
+  <!-- Settings -->
+  <div class="card anim">
+    <div style="padding:16px 20px;border-bottom:1px solid var(--bd)">
+      <div class="st"><i class="bi bi-sliders c-ac" style="margin-right:7px"></i>Настройки</div>
+    </div>
+    <div style="padding:18px 20px">
+      <form method="post">
+        <div class="fg">
+          <label class="lbl">Название</label>
+          <input type="text" name="title" value="{{ quiz.title }}" required>
+        </div>
+        <div class="fg">
+          <label class="lbl">Предмет</label>
+          <select name="subject_id">
+            {% for s in subjects %}
+            <option value="{{ s.id }}" {% if quiz.subject_id == s.id %}selected{% endif %}>{{ s.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="fg">
+          <label class="lbl">Описание</label>
+          <textarea name="description" rows="2">{{ quiz.description }}</textarea>
+        </div>
+        <div class="g2">
+          <div class="fg">
+            <label class="lbl">Время (мин)</label>
+            <input type="number" name="time_limit" value="{{ quiz.time_limit }}" min="0">
+          </div>
+          <div class="fg">
+            <label class="lbl">Проходной (%)</label>
+            <input type="number" name="passing_score" value="{{ quiz.passing_score }}" min="1" max="100">
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:9px;margin-bottom:18px">
+          <input type="checkbox" name="is_active" id="ia" {% if quiz.is_active %}checked{% endif %}>
+          <label for="ia" class="ts tm" style="cursor:pointer">Активен</label>
+        </div>
+        <button type="submit" class="btn btn-p btn-full"><i class="bi bi-save"></i> Сохранить</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Questions -->
+  <div class="card anim d1">
+    <div style="padding:16px 20px;border-bottom:1px solid var(--bd)" class="flex ic jb">
+      <div class="st"><i class="bi bi-list-ol c-ac" style="margin-right:7px"></i>Вопросы ({{ questions|length }})</div>
+      <a href="{{ url_for('add_question', quiz_id=quiz.id) }}" class="btn btn-p btn-sm"><i class="bi bi-plus-lg"></i></a>
+    </div>
+    {% if questions %}
+    {% for q in questions %}
+    <div style="display:flex;align-items:flex-start;gap:11px;padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.035);transition:background .1s" onmouseover="this.style.background='rgba(255,255,255,.02)'" onmouseout="this.style.background=''">
+      <div style="width:24px;height:24px;border-radius:6px;background:rgba(124,106,247,.12);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;color:var(--ac);flex-shrink:0;font-family:'Syne',sans-serif;margin-top:1px">{{ loop.index }}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:500;font-size:.87rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ q.text[:68] }}{% if q.text|length > 68 %}…{% endif %}</div>
+        <div class="tx td flex gap3 mt2">
+          <span>{{ 'Один ответ' if q.question_type == 'single' else 'Несколько' }}</span>
+          <span>{{ q.answers|length }} вариантов</span>
+          <span class="c-ps">{{ q.correct_answers|length }} правильных</span>
+        </div>
+      </div>
+      <div class="flex gap2" style="flex-shrink:0">
+        <a href="{{ url_for('edit_question', question_id=q.id) }}" class="btn btn-g btn-sm"><i class="bi bi-pencil"></i></a>
+        <form method="post" action="{{ url_for('delete_question', question_id=q.id) }}" onsubmit="return confirm('Удалить?')">
+          <button type="submit" class="btn btn-d btn-sm"><i class="bi bi-trash"></i></button>
+        </form>
+      </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="tc" style="padding:44px 20px">
+      <div style="font-size:2.4rem;margin-bottom:9px">❓</div>
+      <div class="fn tm">Вопросов пока нет</div>
+      <div class="ts td mt2 mb4">Добавьте вопросы в тест</div>
+      <a href="{{ url_for('add_question', quiz_id=quiz.id) }}" class="btn btn-p btn-sm">Добавить</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

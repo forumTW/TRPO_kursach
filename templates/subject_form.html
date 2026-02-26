@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Добавить предмет{% endblock %}
+{% block nb_subj %}active{% endblock %}
+{% block content %}
+<div style="max-width:480px">
+  <a href="{{ url_for('subjects') }}" class="btn btn-g btn-sm mb4"><i class="bi bi-arrow-left"></i> Назад</a>
+  <div class="card anim">
+    <div style="padding:18px 22px;border-bottom:1px solid var(--bd)">
+      <div class="st"><i class="bi bi-collection c-ac" style="margin-right:7px"></i>Добавить предмет</div>
+    </div>
+    <div style="padding:22px">
+      <form method="post">
+        <div class="fg">
+          <label class="lbl">Название предмета</label>
+          <input type="text" name="name" placeholder="Например: Математика" required autofocus>
+        </div>
+        <div class="fg mb6">
+          <label class="lbl">Описание (необязательно)</label>
+          <textarea name="description" rows="3" placeholder="Краткое описание предмета"></textarea>
+        </div>
+        <button type="submit" class="btn btn-p btn-lg"><i class="bi bi-save"></i> Сохранить</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

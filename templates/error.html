@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}Ошибка {{ code }}{% endblock %}
+{% block content %}
+<div style="min-height:70vh;display:flex;align-items:center;justify-content:center;text-align:center">
+  <div>
+    <div class="fn" style="font-size:5rem;color:var(--td);margin-bottom:12px">{{ code }}</div>
+    <div class="fn" style="font-size:1.4rem;margin-bottom:8px">{{ message }}</div>
+    <div class="ts tm mb6">Что-то пошло не так</div>
+    <a href="{{ url_for('home') }}" class="btn btn-p">На главную</a>
+  </div>
+</div>
+{% endblock %}

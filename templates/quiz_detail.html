@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}{{ quiz.title }}{% endblock %}
+{% block nb_home %}active{% endblock %}
+{% block content %}
+<a href="{{ url_for('home') }}" class="btn btn-g btn-sm mb4">
+  <i class="bi bi-arrow-left"></i> Назад
+</a>
+<div style="max-width:660px">
+  <div class="card anim">
+    <div style="padding:30px">
+      <span class="bdg bdg-ac mb4" style="display:inline-flex;margin-bottom:12px">{{ quiz.subject.name }}</span>
+      <div class="fn" style="font-size:1.55rem;margin-bottom:8px">{{ quiz.title }}</div>
+      {% if quiz.description %}<div class="tm ts mb4">{{ quiz.description }}</div>{% endif %}
+      <div class="g3" style="margin-bottom:26px">
+        <div style="background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:11px;padding:14px;text-align:center">
+          <div class="fn c-ac" style="font-size:1.55rem">{{ quiz.question_count }}</div>
+          <div class="tx td" style="margin-top:2px;text-transform:uppercase;letter-spacing:.07em">Вопросов</div>
+        </div>
+        <div style="background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:11px;padding:14px;text-align:center">
+          <div class="fn" style="font-size:1.55rem;color:#ffc850">{{ quiz.passing_score }}%</div>
+          <div class="tx td" style="margin-top:2px;text-transform:uppercase;letter-spacing:.07em">Проходной</div>
+        </div>
+        <div style="background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:11px;padding:14px;text-align:center">
+          <div class="fn" style="font-size:1.55rem;color:var(--ac3)">{% if quiz.time_limit %}{{ quiz.time_limit }} мин{% else %}∞{% endif %}</div>
+          <div class="tx td" style="margin-top:2px;text-transform:uppercase;letter-spacing:.07em">Время</div>
+        </div>
+      </div>
+      {% if quiz.time_limit %}
+      <div class="alert alert-warning mb4">
+        <i class="bi bi-clock-fill"></i>
+        <span>На тест отводится <strong>{{ quiz.time_limit }} минут</strong>. Таймер запустится после нажатия «Начать».</span>
+      </div>
+      {% endif %}
+      <form method="post" action="{{ url_for('start_quiz', quiz_id=quiz.id) }}">
+        <button type="submit" class="btn btn-p btn-xl btn-full">
+          <i class="bi bi-play-fill"></i> Начать тест
+        </button>
+      </form>
+    </div>
+  </div>
+
+  {% if prev_attempts %}
+  <div class="card anim d2 mt4">
+    <div style="padding:16px 22px;border-bottom:1px solid var(--bd)">
+      <div class="st"><i class="bi bi-clock-history tm" style="margin-right:7px"></i>Предыдущие попытки</div>
+    </div>
+    <table>
+      <thead><tr><th>Дата</th><th>Результат</th><th>Ответы</th><th>Статус</th><th></th></tr></thead>
+      <tbody>
+      {% for a in prev_attempts %}
+      <tr>
+        <td class="ts tm">{{ a.started_at.strftime('%d.%m.%Y %H:%M') }}</td>
+        <td class="fw7 fn" style="color:{% if a.is_passed %}var(--pass){% else %}var(--fail){% endif %}">{{ a.score|int }}%</td>
+        <td class="ts tm">{{ a.correct_count }}/{{ a.total_questions }}</td>
+        <td>{% if a.is_passed %}<span class="bdg bdg-ps">Сдан</span>{% else %}<span class="bdg bdg-fl">Не сдан</span>{% endif %}</td>
+        <td><a href="{{ url_for('quiz_result', attempt_id=a.id) }}" class="btn btn-g btn-sm">Разбор</a></td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

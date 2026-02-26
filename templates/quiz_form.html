@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}{% if quiz %}Редактировать тест{% else %}Создать тест{% endif %}{% endblock %}
+{% block nb_create %}{% if not quiz %}active{% endif %}{% endblock %}
+{% block nb_dash %}{% if quiz %}active{% endif %}{% endblock %}
+{% block content %}
+<div style="max-width:600px">
+  <a href="{{ url_for('teacher_dashboard') }}" class="btn btn-g btn-sm mb4"><i class="bi bi-arrow-left"></i> Назад</a>
+  <div class="card anim">
+    <div style="padding:18px 22px;border-bottom:1px solid var(--bd)">
+      <div class="st"><i class="bi bi-pencil-square c-ac" style="margin-right:7px"></i>{% if quiz %}Редактировать тест{% else %}Создать тест{% endif %}</div>
+    </div>
+    <div style="padding:22px">
+      <form method="post" action="{% if quiz %}{{ url_for('edit_quiz', quiz_id=quiz.id) }}{% else %}{{ url_for('create_quiz') }}{% endif %}">
+        <div class="fg">
+          <label class="lbl">Название теста</label>
+          <input type="text" name="title" value="{{ quiz.title if quiz else '' }}" placeholder="Введите название" required>
+        </div>
+        <div class="fg">
+          <label class="lbl">Предмет</label>
+          <select name="subject_id" required>
+            <option value="">— Выберите предмет —</option>
+            {% for s in subjects %}
+            <option value="{{ s.id }}" {% if quiz and quiz.subject_id == s.id %}selected{% endif %}>{{ s.name }}</option>
+            {% endfor %}
+          </select>
+          <div class="hint">Нет нужного? <a href="{{ url_for('create_subject') }}" target="_blank" style="color:var(--ac)">Добавить предмет</a></div>
+        </div>
+        <div class="fg">
+          <label class="lbl">Описание (необязательно)</label>
+          <textarea name="description" rows="3" placeholder="Краткое описание теста">{{ quiz.description if quiz else '' }}</textarea>
+        </div>
+        <div class="g2">
+          <div class="fg">
+            <label class="lbl">Время (мин, 0 = без лимита)</label>
+            <input type="number" name="time_limit" value="{{ quiz.time_limit if quiz else 0 }}" min="0">
+          </div>
+          <div class="fg">
+            <label class="lbl">Проходной балл (%)</label>
+            <input type="number" name="passing_score" value="{{ quiz.passing_score if quiz else 60 }}" min="1" max="100">
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:22px">
+          <input type="checkbox" name="is_active" id="is_active" {% if not quiz or quiz.is_active %}checked{% endif %}>
+          <label for="is_active" class="ts tm" style="cursor:pointer">Активен (виден студентам)</label>
+        </div>
+        <button type="submit" class="btn btn-p btn-lg">
+          <i class="bi bi-save"></i> Сохранить
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

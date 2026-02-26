@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block title %}Главная{% endblock %}
+{% block nb_home %}active{% endblock %}
+{% block content %}
+<div class="ph flex ic jb">
+  <div>
+    <div class="pt anim">Привет, {{ current_user.first_name or current_user.username }} 👋</div>
+    <div class="ps anim d1">Выберите тест для прохождения</div>
+  </div>
+</div>
+
+<div class="g3 anim d1 mb6">
+  <div class="sc"><div class="sc-n ac">{{ stats.total }}</div><div class="sc-l">Пройдено тестов</div></div>
+  <div class="sc"><div class="sc-n ps">{{ stats.avg_score }}%</div><div class="sc-l">Средний балл</div></div>
+  <div class="sc"><div class="sc-n">{{ stats.passed }}</div><div class="sc-l">Успешно сдано</div></div>
+</div>
+
+<div class="card anim d2 mb6">
+  <div style="padding:16px 22px 0;border-bottom:1px solid var(--bd)">
+    <div class="st" style="padding-bottom:14px"><i class="bi bi-collection c-ac" style="margin-right:7px"></i>Доступные тесты</div>
+  </div>
+  {% if quizzes %}
+  {% for q in quizzes %}
+  <a href="{{ url_for('quiz_detail', quiz_id=q.id) }}" style="display:flex;align-items:center;justify-content:space-between;padding:14px 22px;border-bottom:1px solid rgba(255,255,255,.035);text-decoration:none;color:var(--tx);transition:background .12s" onmouseover="this.style.background='rgba(124,106,247,.04)'" onmouseout="this.style.background=''">
+    <div>
+      <div style="font-weight:600;font-size:.92rem;margin-bottom:3px">{{ q.title }}</div>
+      <div class="ts td flex gap3">
+        <span><i class="bi bi-book c-ac" style="margin-right:3px"></i>{{ q.subject.name }}</span>
+        <span><i class="bi bi-question-circle" style="margin-right:3px"></i>{{ q.question_count }} вопросов</span>
+        {% if q.time_limit %}<span><i class="bi bi-clock" style="margin-right:3px"></i>{{ q.time_limit }} мин</span>{% endif %}
+      </div>
+    </div>
+    <div class="flex ic gap3">
+      <span class="bdg bdg-ac">{{ q.passing_score }}%</span>
+      <i class="bi bi-chevron-right td"></i>
+    </div>
+  </a>
+  {% endfor %}
+  {% else %}
+  <div class="tc" style="padding:48px 20px;color:var(--td)">
+    <i class="bi bi-inbox" style="font-size:2.5rem;display:block;margin-bottom:10px"></i>
+    <div class="fw7">Тестов пока нет</div>
+  </div>
+  {% endif %}
+</div>
+
+{% if recent %}
+<div class="card anim d3">
+  <div style="padding:16px 22px;border-bottom:1px solid var(--bd)" class="flex ic jb">
+    <div class="st"><i class="bi bi-clock-history tm" style="margin-right:7px"></i>Последние попытки</div>
+    <a href="{{ url_for('my_results') }}" class="btn btn-g btn-sm">Все результаты</a>
+  </div>
+  <table>
+    <thead><tr><th>Тест</th><th>Дата</th><th>Результат</th><th>Статус</th></tr></thead>
+    <tbody>
+    {% for a in recent %}
+    <tr>
+      <td style="font-weight:500">{{ a.quiz.title }}</td>
+      <td class="td ts">{{ a.started_at.strftime('%d.%m.%Y %H:%M') }}</td>
+      <td class="fw7 fn" style="color:{% if a.is_passed %}var(--pass){% else %}var(--fail){% endif %}">{{ a.score|int }}%</td>
+      <td>{% if a.is_passed %}<span class="bdg bdg-ps">Сдан</span>{% else %}<span class="bdg bdg-fl">Не сдан</span>{% endif %}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endblock %}

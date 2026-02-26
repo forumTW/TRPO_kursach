@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Статистика: {{ quiz.title }}{% endblock %}
+{% block nb_dash %}active{% endblock %}
+{% block content %}
+<a href="{{ url_for('teacher_dashboard') }}" class="btn btn-g btn-sm mb4"><i class="bi bi-arrow-left"></i> Назад</a>
+<div class="ph">
+  <div class="pt anim">{{ quiz.title }}</div>
+  <div class="ps anim d1">{{ quiz.subject.name }} · Статистика</div>
+</div>
+<div class="g4 anim d1 mb6">
+  <div class="sc"><div class="sc-n ac">{{ stats.total }}</div><div class="sc-l">Попыток</div></div>
+  <div class="sc"><div class="sc-n ps">{{ stats.avg_score }}%</div><div class="sc-l">Средний балл</div></div>
+  <div class="sc"><div class="sc-n">{{ stats.passed }}</div><div class="sc-l">Сдали</div></div>
+  <div class="sc"><div class="sc-n" style="color:#ffc850">{{ quiz.passing_score }}%</div><div class="sc-l">Проходной</div></div>
+</div>
+<div class="card anim d2">
+  <div style="padding:16px 22px;border-bottom:1px solid var(--bd)"><div class="st">Попытки студентов</div></div>
+  {% if attempts %}
+  <table>
+    <thead><tr><th>Студент</th><th>Дата</th><th>Результат</th><th>Ответы</th><th>Время</th><th>Статус</th></tr></thead>
+    <tbody>
+    {% for a in attempts %}
+    <tr>
+      <td>
+        <div class="flex ic gap2">
+          <div class="ava" style="width:26px;height:26px;font-size:.65rem">{{ a.student.initials }}</div>
+          <div>
+            <div style="font-weight:500">{{ a.student.full_name }}</div>
+            <div class="tx td">@{{ a.student.username }}</div>
+          </div>
+        </div>
+      </td>
+      <td class="ts td">{{ a.finished_at.strftime('%d.%m.%Y %H:%M') if a.finished_at }}</td>
+      <td>
+        <div class="flex ic gap2">
+          <div class="pbar"><div class="pbar-f {% if not a.is_passed %}fail{% endif %}" style="width:{{ a.score }}%"></div></div>
+          <span class="fw7 fn" style="color:{% if a.is_passed %}var(--pass){% else %}var(--fail){% endif %}">{{ a.score|int }}%</span>
+        </div>
+      </td>
+      <td class="ts tm">{{ a.correct_count }}/{{ a.total_questions }}</td>
+      <td class="ts td">{{ a.duration }}</td>
+      <td>{% if a.is_passed %}<span class="bdg bdg-ps">Сдан</span>{% else %}<span class="bdg bdg-fl">Не сдан</span>{% endif %}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="tc" style="padding:48px">
+    <div style="font-size:2.5rem;margin-bottom:10px">📊</div>
+    <div class="fn tm">Данных пока нет</div>
+    <div class="ts td mt2">Студенты ещё не проходили этот тест</div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

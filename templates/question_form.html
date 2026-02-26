@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% block title %}{% if question %}Редактировать вопрос{% else %}Добавить вопрос{% endif %}{% endblock %}
+{% block nb_dash %}active{% endblock %}
+{% block extra_css %}
+<style>
+.ans-row{background:rgba(255,255,255,.025);border:1px solid var(--bd);border-radius:11px;padding:14px;margin-bottom:9px}
+</style>
+{% endblock %}
+{% block content %}
+<div style="max-width:740px">
+  <a href="{{ url_for('edit_quiz', quiz_id=quiz.id) }}" class="btn btn-g btn-sm mb4">
+    <i class="bi bi-arrow-left"></i> К тесту «{{ quiz.title }}»
+  </a>
+  <div class="card anim">
+    <div style="padding:18px 22px;border-bottom:1px solid var(--bd)">
+      <div class="st"><i class="bi bi-question-circle c-ac" style="margin-right:7px"></i>{% if question %}Редактировать вопрос{% else %}Добавить вопрос{% endif %}</div>
+    </div>
+    <div style="padding:22px">
+      <form method="post">
+        <div class="fg">
+          <label class="lbl">Текст вопроса</label>
+          <textarea name="text" rows="3" placeholder="Введите вопрос" required>{{ question.text if question else '' }}</textarea>
+        </div>
+        <div class="g2">
+          <div class="fg">
+            <label class="lbl">Тип вопроса</label>
+            <select name="question_type" id="qtype" onchange="updateIndicators()">
+              <option value="single" {% if not question or question.question_type == 'single' %}selected{% endif %}>Один правильный ответ</option>
+              <option value="multiple" {% if question and question.question_type == 'multiple' %}selected{% endif %}>Несколько правильных</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label class="lbl">Порядок отображения</label>
+            <input type="number" name="order" value="{{ question.order if question else next_order }}" min="0">
+          </div>
+        </div>
+        <div class="fg">
+          <label class="lbl">Объяснение (показывается после теста)</label>
+          <textarea name="explanation" rows="2" placeholder="Необязательно">{{ question.explanation if question else '' }}</textarea>
+        </div>
+
+        <hr>
+        <div class="fn ts mb3" style="color:var(--tm);text-transform:uppercase;letter-spacing:.06em">
+          <i class="bi bi-list-check c-ac" style="margin-right:6px"></i>Варианты ответов
+        </div>
+        <div class="alert alert-info mb4">
+          <i class="bi bi-info-circle-fill"></i>
+          <span>Отметьте <strong>правильный ответ</strong>. Пустые строки игнорируются.</span>
+        </div>
+
+        <div id="answers">
+        {% if question %}
+          {% for a in question.answers %}
+          <div class="ans-row">
+            <div style="display:grid;grid-template-columns:1fr 80px auto;gap:10px;align-items:end">
+              <div>
+                <label class="lbl">Вариант {{ loop.index }}</label>
+                <input type="text" name="answer_text_{{ loop.index }}" value="{{ a.text }}">
+              </div>
+              <div>
+                <label class="lbl">Порядок</label>
+                <input type="number" name="answer_order_{{ loop.index }}" value="{{ a.order }}" min="1">
+              </div>
+              <div style="padding-bottom:2px;display:flex;flex-direction:column;align-items:center;gap:4px">
+                <label class="lbl">Верный</label>
+                <input type="checkbox" name="answer_correct_{{ loop.index }}" {% if a.is_correct %}checked{% endif %}>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+          {% set extra = 4 - question.answers|length %}
+          {% if extra > 0 %}
+          {% for i in range(extra) %}
+          {% set n = question.answers|length + loop.index %}
+          <div class="ans-row">
+            <div style="display:grid;grid-template-columns:1fr 80px auto;gap:10px;align-items:end">
+              <div><label class="lbl">Вариант {{ n }}</label><input type="text" name="answer_text_{{ n }}" placeholder="Введите вариант"></div>
+              <div><label class="lbl">Порядок</label><input type="number" name="answer_order_{{ n }}" value="{{ n }}" min="1"></div>
+              <div style="padding-bottom:2px;display:flex;flex-direction:column;align-items:center;gap:4px"><label class="lbl">Верный</label><input type="checkbox" name="answer_correct_{{ n }}"></div>
+            </div>
+          </div>
+          {% endfor %}
+          {% endif %}
+        {% else %}
+          {% for i in range(1, 5) %}
+          <div class="ans-row">
+            <div style="display:grid;grid-template-columns:1fr 80px auto;gap:10px;align-items:end">
+              <div><label class="lbl">Вариант {{ i }}</label><input type="text" name="answer_text_{{ i }}" placeholder="Введите вариант"></div>
+              <div><label class="lbl">Порядок</label><input type="number" name="answer_order_{{ i }}" value="{{ i }}" min="1"></div>
+              <div style="padding-bottom:2px;display:flex;flex-direction:column;align-items:center;gap:4px"><label class="lbl">Верный</label><input type="checkbox" name="answer_correct_{{ i }}"></div>
+            </div>
+          </div>
+          {% endfor %}
+        {% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-p btn-lg mt4">
+          <i class="bi bi-save"></i> Сохранить вопрос
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

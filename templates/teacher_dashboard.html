@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% block title %}Дашборд{% endblock %}
+{% block nb_dash %}active{% endblock %}
+{% block content %}
+<div class="ph flex ic jb">
+  <div><div class="pt anim">Дашборд</div><div class="ps anim d1">Управление тестами</div></div>
+  <a href="{{ url_for('create_quiz') }}" class="btn btn-p anim d2"><i class="bi bi-plus-lg"></i> Новый тест</a>
+</div>
+
+<div class="g4 anim d1 mb6">
+  <div class="sc"><div class="sc-n ac">{{ quizzes|length }}</div><div class="sc-l">Тестов</div></div>
+  <div class="sc"><div class="sc-n">{{ total_students }}</div><div class="sc-l">Студентов</div></div>
+  <div class="sc"><div class="sc-n ps">{{ recent|length }}</div><div class="sc-l">Попыток</div></div>
+  <div class="sc"><div class="sc-n" style="color:var(--ac3)">{{ subjects|length }}</div><div class="sc-l">Предметов</div></div>
+</div>
+
+<div class="card anim d2 mb4">
+  <div style="padding:16px 22px;border-bottom:1px solid var(--bd)" class="flex ic jb">
+    <div class="st"><i class="bi bi-collection c-ac" style="margin-right:7px"></i>Мои тесты</div>
+    <a href="{{ url_for('create_quiz') }}" class="btn btn-g btn-sm"><i class="bi bi-plus-lg"></i></a>
+  </div>
+  {% if quizzes %}
+  <table>
+    <thead><tr><th>Название</th><th>Предмет</th><th>Вопросов</th><th>Статус</th><th>Действия</th></tr></thead>
+    <tbody>
+    {% for q in quizzes %}
+    <tr>
+      <td style="font-weight:600">{{ q.title }}</td>
+      <td><span class="bdg bdg-ac">{{ q.subject.name }}</span></td>
+      <td class="tm">{{ q.question_count }}</td>
+      <td>{% if q.is_active %}<span class="bdg bdg-ok">Активен</span>{% else %}<span class="bdg bdg-of">Скрыт</span>{% endif %}</td>
+      <td>
+        <div class="flex gap2">
+          <a href="{{ url_for('edit_quiz', quiz_id=q.id) }}" class="btn btn-g btn-sm"><i class="bi bi-pencil"></i></a>
+          <a href="{{ url_for('quiz_stats', quiz_id=q.id) }}" class="btn btn-t btn-sm"><i class="bi bi-bar-chart"></i></a>
+          <form method="post" action="{{ url_for('delete_quiz', quiz_id=q.id) }}" style="display:inline" onsubmit="return confirm('Удалить тест?')">
+            <button type="submit" class="btn btn-d btn-sm"><i class="bi bi-trash"></i></button>
+          </form>
+        </div>
+      </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="tc" style="padding:48px 20px">
+    <div style="font-size:2.6rem;margin-bottom:10px">📝</div>
+    <div class="fn tm">Тестов пока нет</div>
+    <div class="ts td mt2 mb4">Создайте первый тест</div>
+    <a href="{{ url_for('create_quiz') }}" class="btn btn-p">Создать</a>
+  </div>
+  {% endif %}
+</div>
+
+{% if recent %}
+<div class="card anim d3">
+  <div style="padding:16px 22px;border-bottom:1px solid var(--bd)">
+    <div class="st"><i class="bi bi-people tm" style="margin-right:7px"></i>Последние попытки студентов</div>
+  </div>
+  <table>
+    <thead><tr><th>Студент</th><th>Тест</th><th>Дата</th><th>Результат</th><th>Статус</th></tr></thead>
+    <tbody>
+    {% for a in recent %}
+    <tr>
+      <td>
+        <div class="flex ic gap2">
+          <div class="ava" style="width:26px;height:26px;font-size:.65rem">{{ a.student.initials }}</div>
+          <span style="font-weight:500">{{ a.student.full_name }}</span>
+        </div>
+      </td>
+      <td class="tm">{{ a.quiz.title }}</td>
+      <td class="ts td">{{ a.finished_at.strftime('%d.%m.%Y %H:%M') if a.finished_at }}</td>
+      <td class="fw7 fn" style="color:{% if a.is_passed %}var(--pass){% else %}var(--fail){% endif %}">{{ a.score|int }}%</td>
+      <td>{% if a.is_passed %}<span class="bdg bdg-ps">Сдан</span>{% else %}<span class="bdg bdg-fl">Не сдан</span>{% endif %}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endblock %}

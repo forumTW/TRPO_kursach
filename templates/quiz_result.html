@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}Результат{% endblock %}
+{% block content %}
+<div style="max-width:760px">
+  <div class="card anim mb4" style="border-color:{% if attempt.is_passed %}rgba(26,255,154,.25){% else %}rgba(255,95,126,.25){% endif %}">
+    <div style="padding:32px;text-align:center;border-bottom:1px solid var(--bd)">
+      <div style="font-size:3.2rem;margin-bottom:14px">{% if attempt.is_passed %}🎉{% else %}📚{% endif %}</div>
+      <div class="fn" style="font-size:1.7rem;color:{% if attempt.is_passed %}var(--pass){% else %}var(--fail){% endif %};margin-bottom:5px">{% if attempt.is_passed %}Тест сдан!{% else %}Тест не сдан{% endif %}</div>
+      <div class="ts tm">{{ attempt.quiz.title }}</div>
+
+      <div style="width:105px;height:105px;border-radius:50%;border:3px solid {% if attempt.is_passed %}var(--pass){% else %}var(--fail){% endif %};background:{% if attempt.is_passed %}var(--pbg){% else %}var(--fbg){% endif %};display:flex;flex-direction:column;align-items:center;justify-content:center;margin:22px auto">
+        <span class="fn" style="font-size:1.75rem;color:{% if attempt.is_passed %}var(--pass){% else %}var(--fail){% endif %};line-height:1">{{ attempt.score|int }}</span>
+        <span style="font-size:.7rem;color:{% if attempt.is_passed %}var(--pass){% else %}var(--fail){% endif %};opacity:.7">%</span>
+      </div>
+
+      <div class="flex jc" style="gap:22px;margin-bottom:22px">
+        <div class="tc"><div class="fn" style="font-size:1.15rem">{{ attempt.correct_count }}/{{ attempt.total_questions }}</div><div class="tx td" style="text-transform:uppercase;letter-spacing:.06em;margin-top:2px">Правильно</div></div>
+        <div style="width:1px;background:var(--bd)"></div>
+        <div class="tc"><div class="fn" style="font-size:1.15rem">{{ attempt.quiz.passing_score }}%</div><div class="tx td" style="text-transform:uppercase;letter-spacing:.06em;margin-top:2px">Проходной</div></div>
+        <div style="width:1px;background:var(--bd)"></div>
+        <div class="tc"><div class="fn" style="font-size:1.15rem">{{ attempt.duration }}</div><div class="tx td" style="text-transform:uppercase;letter-spacing:.06em;margin-top:2px">Время</div></div>
+      </div>
+
+      <div class="flex jc gap3">
+        <a href="{{ url_for('quiz_detail', quiz_id=attempt.quiz_id) }}" class="btn btn-g"><i class="bi bi-arrow-repeat"></i> Ещё раз</a>
+        <a href="{{ url_for('home') }}" class="btn btn-p"><i class="bi bi-house"></i> На главную</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="fn ts mb3" style="color:var(--tm);text-transform:uppercase;letter-spacing:.06em"><i class="bi bi-list-check c-ac" style="margin-right:7px"></i>Разбор ответов</div>
+
+  {% for sa in attempt.student_answers %}
+  <div class="card anim mb3" style="animation-delay:{{ loop.index0 * 30 }}ms;border-left:3px solid {% if sa.is_correct %}var(--pass){% else %}var(--fail){% endif %}">
+    <div style="padding:18px 22px">
+      <div class="flex" style="gap:11px;align-items:flex-start">
+        <i class="bi bi-{% if sa.is_correct %}check-circle-fill c-ps{% else %}x-circle-fill c-fl{% endif %}" style="font-size:1rem;flex-shrink:0;margin-top:2px"></i>
+        <div style="flex:1">
+          <div style="font-weight:600;margin-bottom:11px;line-height:1.5">{{ loop.index }}. {{ sa.question.text }}</div>
+          {% for a in sa.question.answers %}
+          {% set selected = a in sa.selected_answers %}
+          <div style="display:flex;align-items:center;gap:9px;padding:7px 11px;border-radius:7px;margin-bottom:5px;border:1px solid {% if a.is_correct %}rgba(26,255,154,.2){% elif selected and not a.is_correct %}rgba(255,95,126,.2){% else %}var(--bd){% endif %};background:{% if a.is_correct %}var(--pbg){% elif selected and not a.is_correct %}var(--fbg){% else %}rgba(255,255,255,.015){% endif %}">
+            <i class="bi bi-{% if a.is_correct %}check-circle-fill{% elif selected and not a.is_correct %}x-circle-fill{% else %}circle{% endif %}" style="color:{% if a.is_correct %}var(--pass){% elif selected and not a.is_correct %}var(--fail){% else %}var(--td){% endif %};flex-shrink:0"></i>
+            <span style="font-size:.86rem;flex:1">{{ a.text }}</span>
+            {% if selected %}<span style="font-size:.68rem;color:var(--td);background:rgba(255,255,255,.06);padding:1px 7px;border-radius:10px">Ваш</span>{% endif %}
+          </div>
+          {% endfor %}
+          {% if sa.question.explanation %}
+          <div style="margin-top:9px;padding:9px 12px;background:rgba(124,106,247,.06);border:1px solid rgba(124,106,247,.15);border-radius:7px;font-size:.8rem;color:var(--tm)">
+            <i class="bi bi-lightbulb-fill" style="color:#ffc850;margin-right:5px"></i>{{ sa.question.explanation }}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
